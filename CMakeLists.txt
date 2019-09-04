@@ -4,7 +4,7 @@ project(lio)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++14)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 #set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 ## Find catkin macros and libraries
@@ -34,15 +34,37 @@ include_directories(${GFLAGS_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
 
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
-
+# PCL
+# this is needed to resolve incompatibility issue with c++11 and system installed PCL libraries
+set(EXTERNAL_LIB_DIR "/opt/plusai/external/opt")
+list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_LIB_DIR}/pcl")
+set(PCL_DIR ${EXTERNAL_LIB_DIR}/pcl)
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+# Since PCL may be installed within drive/ we must force the installed RPATH.
+list(APPEND CMAKE_INSTALL_RPATH "${PCL_LIBRARY_DIRS}")
+#find_package(PCL REQUIRED)
+#include_directories(${PCL_INCLUDE_DIRS})
+message(STATUS "=================================PCL_INCLUDE_DIRS: ${PCL_INCLUDE_DIRS}")
+message(STATUS "*********************************PCL_LIBRARY_DIRS: ${PCL_LIBRARY_DIRS}")
+message(STATUS "PCL_LIBRARIES: ${PCL_LIBRARIES}")
+message(STATUS "PCL_VERSION: ${PCL_VERSION}")
+
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIR})
+message(STATUS "=================================OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIR}")
+message(STATUS "OpenCV_LIBRARIES: ${OpenCV_LIBRARIES}")
+message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}")
 
+
+set(EXTERNAL_LIB_DIR "/opt/plusai/external/opt")
+list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_LIB_DIR}/ceres")
+set(CERES_DIR ${EXTERNAL_LIB_DIR}/ceres)
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIR})
+message(STATUS "Ceres_LIB: ${CERES_LIBRARIES}")
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -452,3 +474,4 @@ ${PROJECT_NAME}-factor
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
